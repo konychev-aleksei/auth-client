@@ -1,0 +1,25 @@
+.wrapper {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 20px;
+
+  & > * {
+    width: min(500px, 70vw) !important;
+  }
+
+  & > h2, & > p, & > a {
+    text-align: center;
+    margin: 10px 0;
+    color: #222;
+    font-weight: 100;
+  }
+}
+
+.button {
+  background-color: #121212 !important;
+  color: white !important;
+  margin-top: 25px !important;
+  text-transform: none !important;
+  height: 55px;
+}
