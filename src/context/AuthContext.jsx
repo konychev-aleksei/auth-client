@@ -54,8 +54,6 @@ Api.interceptors.response.use(
         return Promise.reject(error);
       }
 
-      console.log(originalRequest);
-
       originalRequest.headers["Authorization"] = "Bearer " + accessToken;
       return Api(originalRequest);
     }

@@ -8,14 +8,12 @@ const EXPIRY = {
 export const saveAccessToken = (accessToken) => {
   Cookies.set("accessToken", accessToken, {
     expires: EXPIRY.ACCESS_TOKEN,
-    path: "",
   });
 };
 
 export const saveRefreshToken = (refreshToken) => {
   Cookies.set("refreshToken", refreshToken, {
     expires: EXPIRY.REFRESH_TOKENs,
-    path: "",
   });
 };
 
