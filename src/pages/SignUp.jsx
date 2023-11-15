@@ -4,7 +4,7 @@ import style from "./style.module.scss";
 import { AuthContext } from "../context/AuthContext";
 import { useContext } from "react";
 import { yupResolver } from "@hookform/resolvers";
-import { userCredentialsSchema } from "../utils/validtionSchemas";
+import { userCredentialsSchema } from "./validtionSchema";
 
 export default function SignUp() {
   const { handleSignUp } = useContext(AuthContext);
