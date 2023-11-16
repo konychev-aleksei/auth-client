@@ -29,7 +29,7 @@ export default function SignIn() {
       <h2>Войти в аккаунт</h2>
       <TextField
         {...register("userName")}
-        label="Логин"
+        label="Имя пользователя"
         variant="standard"
         error={Boolean(errors.userName)}
         helperText={errors.userName?.message}

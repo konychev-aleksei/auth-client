@@ -46,7 +46,7 @@ export default function SignUp() {
       <h2>Создать аккаунт</h2>
       <TextField
         {...register("userName")}
-        label="Логин"
+        label="Имя пользователя"
         variant="standard"
         error={Boolean(errors.userName)}
         helperText={errors.userName?.message}
