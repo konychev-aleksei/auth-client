@@ -2,8 +2,10 @@ import { createContext, useState } from "react";
 import axios from "axios";
 import getBrowserFingerprint from "get-browser-fingerprint";
 
-const ApiClient = axios.create({
-  baseURL: "http://localhost:8080/api",
+const fingerPrint = getBrowserFingerprint();
+
+const ResourceClient = axios.create({
+  baseURL: "http://localhost:5000/api",
   withCredentials: true,
 });
 
@@ -12,7 +14,29 @@ const AuthClient = axios.create({
   withCredentials: true,
 });
 
-const fingerPrint = getBrowserFingerprint();
+ResourceClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response.status === 403 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        await AuthClient("/refresh", {
+          refreshToken,
+          fingerPrint,
+        });
+      } catch (error) {
+        return Promise.reject(error);
+      }
+
+      return ResourceClient(originalRequest);
+    }
+
+    return Promise.reject(error);
+  }
+);
 
 export const AuthContext = createContext({});
 
@@ -21,7 +45,7 @@ const AuthProvider = ({ children }) => {
 
   const handleFetchProtected = async () => {
     try {
-      const response = await ApiClient.get("/protected");
+      const response = await ResourceClient.get("/protected");
       setData(response.data);
     } catch (error) {
       console.log(error);
