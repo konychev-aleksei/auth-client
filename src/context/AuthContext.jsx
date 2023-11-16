@@ -1,13 +1,18 @@
 import { createContext, useState } from "react";
 import axios from "axios";
+import getBrowserFingerprint from "get-browser-fingerprint";
 
 const ApiClient = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: "http://localhost:8080/api",
+  withCredentials: true,
 });
 
 const AuthClient = axios.create({
   baseURL: "http://localhost:5000/auth",
+  withCredentials: true,
 });
+
+const fingerPrint = getBrowserFingerprint();
 
 export const AuthContext = createContext({});
 
@@ -33,8 +38,10 @@ const AuthProvider = ({ children }) => {
 
   const handleSignUp = (data) => {
     try {
-    
-      AuthClient.post("/registration", data);
+      AuthClient.post("/sign-up", {
+        ...data,
+        fingerPrint,
+      });
     } catch (error) {
       console.log(error);
     }
@@ -42,7 +49,7 @@ const AuthProvider = ({ children }) => {
 
   const handleSignIn = (data) => {
     try {
-      AuthClient.post("/login", data);
+      AuthClient.post("/sign-in", { ...data, fingerPrint });
     } catch (error) {
       console.log(error);
     }

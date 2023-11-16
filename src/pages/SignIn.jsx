@@ -3,19 +3,22 @@ import { TextField, Button } from "@mui/material";
 import style from "./style.module.scss";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { yupResolver } from "@hookform/resolvers";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { userCredentialsSchema } from "./validtionSchema";
 
 export default function SignIn() {
   const { handleSignIn } = useContext(AuthContext);
 
-  const { register, handleSubmit } = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
     defaultValues: {
       userName: "",
       password: "",
     },
     resolver: yupResolver(userCredentialsSchema),
-    formState: { errors },
   });
 
   return (
