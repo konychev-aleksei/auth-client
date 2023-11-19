@@ -68,9 +68,9 @@ export default function SignUp() {
             options={rolesList}
             variant="standard"
           >
-            <MenuItem value={1}>Администратор</MenuItem>
-            <MenuItem value={2}>Модератор</MenuItem>
-            <MenuItem value={3}>Пользователь</MenuItem>
+            {rolesList.map(({ id, title }) => (
+              <MenuItem value={id}>{title}</MenuItem>
+            ))}
           </Select>
         )}
       />

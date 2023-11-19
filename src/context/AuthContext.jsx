@@ -1,83 +1,64 @@
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect } from "react";
 import axios from "axios";
-import getBrowserFingerprint from "get-browser-fingerprint";
-
-const fingerPrint = getBrowserFingerprint();
+import inMemoryJWTService from "../services/inMemoryJWTService";
 
 const ResourceClient = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: "http://localhost:5000/resource",
   withCredentials: true,
 });
 
-const AuthClient = axios.create({
+export const AuthClient = axios.create({
   baseURL: "http://localhost:5000/auth",
   withCredentials: true,
 });
 
-ResourceClient.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-
-    if (error.response.status === 403 && !originalRequest._retry) {
-      originalRequest._retry = true;
-
-      try {
-        await AuthClient("/refresh", {
-          refreshToken,
-          fingerPrint,
-        });
-      } catch (error) {
-        return Promise.reject(error);
-      }
-
-      return ResourceClient(originalRequest);
-    }
-
-    return Promise.reject(error);
-  }
-);
-
 export const AuthContext = createContext({});
 
 const AuthProvider = ({ children }) => {
-  const [data, setData] = useState({});
+  const [data, setData] = useState("");
 
-  const handleFetchProtected = async () => {
-    try {
-      const response = await ResourceClient.get("/protected");
-      setData(response.data);
-    } catch (error) {
-      console.log(error);
-    }
+  const handleFetchProtected = () => {
+    ResourceClient.get("/protected")
+      .then((res) => {
+        setData(res.data);
+      })
+      .catch(console.error);
   };
 
   const handleLogOut = () => {
-    try {
-      AuthClient.delete("/logout");
-    } catch (error) {
-      console.log(error);
-    }
+    AuthClient.delete("/logout")
+      .then(() => {
+        inMemoryJWTService.deleteToken();
+      })
+      .catch(console.error);
   };
 
   const handleSignUp = (data) => {
-    try {
-      AuthClient.post("/sign-up", {
-        ...data,
-        fingerPrint,
-      });
-    } catch (error) {
-      console.log(error);
-    }
+    AuthClient.post("/sign-up", data)
+      .then((res) => {
+        const { accessToken, accessTokenExpiration } = res.data;
+        inMemoryJWTService.setToken(accessToken, accessTokenExpiration);
+      })
+      .catch(console.error);
   };
 
   const handleSignIn = (data) => {
-    try {
-      AuthClient.post("/sign-in", { ...data, fingerPrint });
-    } catch (error) {
-      console.log(error);
-    }
+    AuthClient.post("/sign-in", data)
+      .then((res) => {
+        const { accessToken, accessTokenExpiration } = res.data;
+        inMemoryJWTService.setToken(accessToken, accessTokenExpiration);
+      })
+      .catch(console.error);
   };
+
+  useEffect(() => {
+    AuthClient.post("/refresh")
+      .then((res) => {
+        const { accessToken, accessTokenExpiration } = res.data;
+        inMemoryJWTService.setToken(accessToken, accessTokenExpiration);
+      })
+      .catch(console.error);
+  }, []);
 
   return (
     <AuthContext.Provider
