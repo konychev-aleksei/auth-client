@@ -1,63 +1,99 @@
 import { createContext, useState, useEffect } from "react";
 import axios from "axios";
-import inMemoryJWTService from "../services/inMemoryJWTService";
+import { CircularProgress } from "@mui/material";
+import inMemoryJWT from "../services/inMemoryJWTService";
+import config from "../config";
+import style from "../app.module.scss";
+import showErrorMessage from "../utils/showErrorMessage";
 
 const ResourceClient = axios.create({
-  baseURL: "http://localhost:5000/resource",
+  baseURL: `${config.API_URL}/resource`,
   withCredentials: true,
 });
 
 export const AuthClient = axios.create({
-  baseURL: "http://localhost:5000/auth",
+  baseURL: `${config.API_URL}/auth`,
   withCredentials: true,
 });
+
+ResourceClient.interceptors.request.use(
+  (config) => {
+    const accessToken = inMemoryJWT.getToken();
+
+    if (!accessToken) {
+      return config;
+    }
+
+    config.headers["Authorization"] = "Bearer " + accessToken;
+    return config;
+  },
+  (error) => {
+    Promise.reject(error);
+  }
+);
 
 export const AuthContext = createContext({});
 
 const AuthProvider = ({ children }) => {
-  const [data, setData] = useState("");
+  const [isAppReady, setIsAppReady] = useState(false);
+  const [isUserLogged, setIsUserLogged] = useState(false);
+  const [data, setData] = useState();
 
   const handleFetchProtected = () => {
     ResourceClient.get("/protected")
       .then((res) => {
         setData(res.data);
       })
-      .catch(console.error);
+      .catch(showErrorMessage);
   };
 
   const handleLogOut = () => {
-    AuthClient.delete("/logout")
+    AuthClient.post("/logout")
       .then(() => {
-        inMemoryJWTService.deleteToken();
+        setIsUserLogged(false);
+        inMemoryJWT.deleteToken();
+
+        setData();
       })
-      .catch(console.error);
+      .catch(showErrorMessage);
   };
 
   const handleSignUp = (data) => {
     AuthClient.post("/sign-up", data)
       .then((res) => {
         const { accessToken, accessTokenExpiration } = res.data;
-        inMemoryJWTService.setToken(accessToken, accessTokenExpiration);
+
+        console.log(accessToken);
+        inMemoryJWT.setToken(accessToken, accessTokenExpiration);
+
+        setIsUserLogged(true);
       })
-      .catch(console.error);
+      .catch(showErrorMessage);
   };
 
   const handleSignIn = (data) => {
     AuthClient.post("/sign-in", data)
       .then((res) => {
         const { accessToken, accessTokenExpiration } = res.data;
-        inMemoryJWTService.setToken(accessToken, accessTokenExpiration);
+        inMemoryJWT.setToken(accessToken, accessTokenExpiration);
+
+        setIsUserLogged(true);
       })
-      .catch(console.error);
+      .catch(showErrorMessage);
   };
 
   useEffect(() => {
     AuthClient.post("/refresh")
       .then((res) => {
         const { accessToken, accessTokenExpiration } = res.data;
-        inMemoryJWTService.setToken(accessToken, accessTokenExpiration);
+        inMemoryJWT.setToken(accessToken, accessTokenExpiration);
+
+        setIsAppReady(true);
+        setIsUserLogged(true);
       })
-      .catch(console.error);
+      .catch(() => {
+        setIsAppReady(true);
+      });
   }, []);
 
   return (
@@ -68,9 +104,16 @@ const AuthProvider = ({ children }) => {
         handleSignUp,
         handleSignIn,
         handleLogOut,
+        isUserLogged,
       }}
     >
-      {children}
+      {isAppReady ? (
+        children
+      ) : (
+        <div className={style.center}>
+          <CircularProgress />
+        </div>
+      )}
     </AuthContext.Provider>
   );
 };

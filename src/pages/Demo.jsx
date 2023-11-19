@@ -8,7 +8,7 @@ export default function Demo() {
 
   return (
     <div className={style.wrapper}>
-      {JSON.stringify(data)}
+      <p>{JSON.stringify(data)}</p>
       <Button onClick={handleFetchProtected} className={style.button}>
         Запрос на защищенный роут
       </Button>

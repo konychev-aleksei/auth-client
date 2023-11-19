@@ -28,7 +28,7 @@ export default function SignUp() {
     register,
     handleSubmit,
     control,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
       userName: "",
@@ -69,12 +69,14 @@ export default function SignUp() {
             variant="standard"
           >
             {rolesList.map(({ id, title }) => (
-              <MenuItem value={id}>{title}</MenuItem>
+              <MenuItem key={id} value={id}>
+                {title}
+              </MenuItem>
             ))}
           </Select>
         )}
       />
-      <Button className={style.button} type="submit">
+      <Button disabled={isSubmitting} className={style.button} type="submit">
         Зарегистрироваться
       </Button>
     </form>

@@ -1,25 +1,42 @@
+import { useContext } from "react";
 import { Link, Routes, Route, BrowserRouter, Navigate } from "react-router-dom";
+import { SnackbarProvider } from "notistack";
 import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
 import Demo from "./pages/Demo";
 import style from "./app.module.scss";
+import { AuthContext } from "./context/AuthContext";
 
-const App = () => (
-  <div className={style.wrapper}>
-    <BrowserRouter>
-      <nav className={style.nav}>
-        <Link to="sign-in">Вход</Link>
-        <Link to="sign-up">Регистрация</Link>
-        <Link to="demo">Демо</Link>
-      </nav>
-      <Routes>
-        <Route path="sign-in" element={<SignIn />} />
-        <Route path="sign-up" element={<SignUp />} />
-        <Route path="demo" element={<Demo />} />
-        <Route path="*" element={<Navigate to="demo" />} />
-      </Routes>
-    </BrowserRouter>
-  </div>
-);
+const App = () => {
+  const { isUserLogged } = useContext(AuthContext);
+
+  return (
+    <div className={style.wrapper}>
+      <SnackbarProvider />
+      <BrowserRouter>
+        {!isUserLogged && (
+          <nav className={style.nav}>
+            <Link to="sign-in">Вход</Link>
+            <Link to="sign-up">Регистрация</Link>
+          </nav>
+        )}
+        <Routes>
+          {isUserLogged ? (
+            <>
+              <Route path="app" element={<Demo />} />
+              <Route path="*" element={<Navigate to="app" />} />
+            </>
+          ) : (
+            <>
+              <Route path="sign-in" element={<SignIn />} />
+              <Route path="sign-up" element={<SignUp />} />
+              <Route path="*" element={<Navigate to="sign-in" />} />
+            </>
+          )}
+        </Routes>
+      </BrowserRouter>
+    </div>
+  );
+};
 
 export default App;

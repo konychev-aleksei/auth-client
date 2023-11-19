@@ -12,7 +12,7 @@ export default function SignIn() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
       userName: "",
@@ -41,7 +41,7 @@ export default function SignIn() {
         error={Boolean(errors.password)}
         helperText={errors.password?.message}
       />
-      <Button className={style.button} type="submit">
+      <Button disabled={isSubmitting} className={style.button} type="submit">
         Войти
       </Button>
     </form>
