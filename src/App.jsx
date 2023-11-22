@@ -22,17 +22,17 @@ const App = () => {
         )}
         <Routes>
           {isUserLogged ? (
-            <>
-              <Route path="app" element={<Demo />} />
-              <Route path="*" element={<Navigate to="app" />} />
-            </>
+            <Route path="demo" element={<Demo />} />
           ) : (
             <>
               <Route path="sign-in" element={<SignIn />} />
               <Route path="sign-up" element={<SignUp />} />
-              <Route path="*" element={<Navigate to="sign-in" />} />
             </>
           )}
+          <Route  
+            path="*"
+            element={<Navigate to={isUserLogged ? "demo" : "sign-in"} />}
+          />
         </Routes>
       </BrowserRouter>
     </div>

@@ -1,14 +1,13 @@
 import { createContext, useState, useEffect } from "react";
 import axios from "axios";
 import { CircularProgress } from "@mui/material";
-import inMemoryJWT from "../services/inMemoryJWTService";
+import inMemoryJWT from "../services/inMemoryJWT";
 import config from "../config";
 import style from "../app.module.scss";
 import showErrorMessage from "../utils/showErrorMessage";
 
 const ResourceClient = axios.create({
   baseURL: `${config.API_URL}/resource`,
-  withCredentials: true,
 });
 
 export const AuthClient = axios.create({
@@ -91,8 +90,9 @@ const AuthProvider = ({ children }) => {
         setIsAppReady(true);
         setIsUserLogged(true);
       })
-      .catch(() => {
+      .catch((error) => {
         setIsAppReady(true);
+        showErrorMessage(error);
       });
   }, []);
 
