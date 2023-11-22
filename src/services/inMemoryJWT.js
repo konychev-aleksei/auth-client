@@ -12,8 +12,7 @@ const inMemoryJWTService = () => {
   });
 
   const refreshToken = (expiration) => {
-    const delay = new Date(expiration).getTime() - new Date().getTime();
-    const timeoutTrigger = delay - 10000;
+    const timeoutTrigger = expiration - 10000;
 
     refreshTimeoutId = setTimeout(() => {
       AuthClient("/refresh")

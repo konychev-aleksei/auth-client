@@ -90,9 +90,8 @@ const AuthProvider = ({ children }) => {
         setIsAppReady(true);
         setIsUserLogged(true);
       })
-      .catch((error) => {
+      .catch(() => {
         setIsAppReady(true);
-        showErrorMessage(error);
       });
   }, []);
 
