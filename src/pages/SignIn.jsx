@@ -6,6 +6,11 @@ import { AuthContext } from "../context/AuthContext";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { userCredentialsSchema } from "./validtionSchema";
 
+const defaultValues = {
+  userName: "",
+  password: "",
+};
+
 export default function SignIn() {
   const { handleSignIn } = useContext(AuthContext);
 
@@ -14,10 +19,7 @@ export default function SignIn() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm({
-    defaultValues: {
-      userName: "",
-      password: "",
-    },
+    defaultValues,
     resolver: yupResolver(userCredentialsSchema),
   });
 
@@ -27,23 +29,29 @@ export default function SignIn() {
       className={style.wrapper}
     >
       <h2>Войти в аккаунт</h2>
-      <TextField
-        {...register("userName")}
-        label="Имя пользователя"
-        variant="standard"
-        error={Boolean(errors.userName)}
-        helperText={errors.userName?.message}
-      />
-      <TextField
-        {...register("password")}
-        label="Пароль"
-        variant="standard"
-        error={Boolean(errors.password)}
-        helperText={errors.password?.message}
-      />
-      <Button disabled={isSubmitting} className={style.button} type="submit">
+      <div className={style.inputField}>
+        <input
+          {...register("userName")}
+          placeholder="Имя пользователя"
+          autocomplete="off"
+        />
+        {Boolean(errors.userName) && (
+          <p className={style.error}>{errors.userName?.message}</p>
+        )}
+      </div>
+      <div className={style.inputField}>
+        <input
+          {...register("password")}
+          autocomplete="off"
+          placeholder="Пароль"
+        />
+        {Boolean(errors.password) && (
+          <p className={style.error}>{errors.password?.message}</p>
+        )}
+      </div>
+      <button disabled={isSubmitting} className={style.button} type="submit">
         Войти
-      </Button>
+      </button>
     </form>
   );
 }

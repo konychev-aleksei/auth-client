@@ -9,12 +9,12 @@ export default function Demo() {
   return (
     <div className={style.wrapper}>
       <p>{JSON.stringify(data)}</p>
-      <Button onClick={handleFetchProtected} className={style.button}>
+      <button onClick={handleFetchProtected}>
         Запрос на защищенный роут
-      </Button>
-      <Button onClick={handleLogOut} className={style.button}>
+      </button>
+      <button onClick={handleLogOut}>
         Выйти
-      </Button>
+      </button>
     </div>
   );
 }
