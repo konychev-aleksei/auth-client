@@ -1,10 +1,11 @@
 import { useForm } from "react-hook-form";
-import { TextField, Button } from "@mui/material";
 import style from "./style.module.scss";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { userCredentialsSchema } from "./validtionSchema";
+import { signInSchema } from "./validtionSchemas";
+import Field from "../components/Field/Field";
+import Button from "../components/Button/Button";
 
 const defaultValues = {
   userName: "",
@@ -20,38 +21,31 @@ export default function SignIn() {
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues,
-    resolver: yupResolver(userCredentialsSchema),
+    resolver: yupResolver(signInSchema),
   });
 
   return (
-    <form
-      onSubmit={handleSubmit((data) => handleSignIn(data))}
-      className={style.wrapper}
-    >
+    <form onSubmit={handleSubmit(handleSignIn)} className={style.wrapper}>
       <h2>Войти в аккаунт</h2>
-      <div className={style.inputField}>
-        <input
-          {...register("userName")}
-          placeholder="Имя пользователя"
-          autocomplete="off"
-        />
-        {Boolean(errors.userName) && (
-          <p className={style.error}>{errors.userName?.message}</p>
-        )}
-      </div>
-      <div className={style.inputField}>
-        <input
-          {...register("password")}
-          autocomplete="off"
-          placeholder="Пароль"
-        />
-        {Boolean(errors.password) && (
-          <p className={style.error}>{errors.password?.message}</p>
-        )}
-      </div>
-      <button disabled={isSubmitting} className={style.button} type="submit">
+      <Field
+        name="userName"
+        register={register}
+        autoComplete="off"
+        placeholder="Имя пользователя"
+        error={Boolean(errors.userName)}
+        helperText={errors.userName?.message}
+      />
+      <Field
+        name="password"
+        register={register}
+        autoComplete="off"
+        placeholder="Пароль"
+        error={Boolean(errors.password)}
+        helperText={errors.password?.message}
+      />
+      <Button disabled={isSubmitting} type="submit">
         Войти
-      </button>
+      </Button>
     </form>
   );
 }

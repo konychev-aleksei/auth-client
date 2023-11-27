@@ -3,7 +3,10 @@ import style from "./style.module.scss";
 import { AuthContext } from "../context/AuthContext";
 import { useContext } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { userCredentialsSchema } from "./validtionSchema";
+import { signUpSchema } from "./validtionSchemas";
+import Select from "../components/Select/Select";
+import Field from "../components/Field/Field";
+import Button from "../components/Button/Button";
 
 const defaultValues = {
   userName: "",
@@ -36,51 +39,38 @@ export default function SignUp() {
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues,
-    resolver: yupResolver(userCredentialsSchema),
+    resolver: yupResolver(signUpSchema),
   });
 
   return (
-    <form
-      className={style.wrapper}
-      onSubmit={handleSubmit((data) => handleSignUp(data))}
-    >
+    <form className={style.wrapper} onSubmit={handleSubmit(handleSignUp)}>
       <h2>Создать аккаунт</h2>
-      <div className={style.inputField}>
-        <input
-          {...register("userName")}
-          placeholder="Имя пользователя"
-          autocomplete="off"
-        />
-        {Boolean(errors.userName) && (
-          <p className={style.error}>{errors.userName?.message}</p>
-        )}
-      </div>
-      <div className={style.inputField}>
-        <input
-          {...register("password")}
-          autocomplete="off"
-          placeholder="Пароль"
-        />
-        {Boolean(errors.password) && (
-          <p className={style.error}>{errors.password?.message}</p>
-        )}
-      </div>
+      <Field
+        name="userName"
+        register={register}
+        autoComplete="off"
+        placeholder="Имя пользователя"
+        error={Boolean(errors.userName)}
+        helperText={errors.userName?.message}
+      />
+      <Field
+        name="password"
+        register={register}
+        autoComplete="off"
+        placeholder="Пароль"
+        error={Boolean(errors.password)}
+        helperText={errors.password?.message}
+      />
       <Controller
         control={control}
         name="role"
         render={({ field: { onChange, value } }) => (
-          <select value={value} className={style.selectField} onChange={onChange}>
-            {rolesList.map(({ id, title }) => (
-              <option key={id} value={id}>
-                {title}
-              </option>
-            ))}
-          </select>
+          <Select onChange={onChange} value={value} options={rolesList} />
         )}
       />
-      <button disabled={isSubmitting} className={style.button} type="submit">
+      <Button disabled={isSubmitting} type="submit">
         Зарегистрироваться
-      </button>
+      </Button>
     </form>
   );
 }
